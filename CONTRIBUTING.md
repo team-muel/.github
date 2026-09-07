@@ -35,11 +35,50 @@ Review in this order:
 
 Resolve or explicitly disposition every material review thread before merge. Do not treat an AI review comment as informational-only when it identifies a correctness, security, data-integrity, or governance risk.
 
+## Review completion gate
+
+For a normal pull request, `review pending` means **do not merge**. The expected sequence is:
+
+1. Deterministic CI passes.
+2. Automated review has completed, including Codex when configured for the repository.
+3. Material findings are fixed or explicitly dispositioned.
+4. Review threads are resolved.
+5. If fixes materially change the diff, request/re-run review and wait for a clean result.
+6. Merge only after the final review state and required checks are known.
+
+A PR must not be merged merely because no finding has arrived yet. Absence of a finding while an automated review is still running is not approval.
+
+### Emergency hotfix exception
+
+An emergency hotfix may bypass the normal review-completion wait only when delaying the merge would materially worsen an active production/security incident.
+
+When using the exception:
+
+- state `Emergency hotfix` and the incident/risk in the PR body;
+- run every deterministic check that can complete without worsening the incident;
+- keep the change minimal and independently revertible;
+- request the normal automated review before or immediately after merge;
+- review late findings as mandatory remediation work, not informational comments;
+- create/link a Linear remediation issue for every material late finding that is not fixed immediately.
+
+The emergency exception is not a convenience path for ordinary urgent work.
+
+## Late-finding remediation
+
+If a material automated-review finding arrives after merge:
+
+1. Re-evaluate it against the current default branch.
+2. Classify it as already fixed, no longer applicable, or still reproducible.
+3. For reproducible correctness/security/data-integrity/governance findings, open or update a Linear remediation issue and fix it with regression coverage.
+4. Link the fixing PR/commit back to the Linear issue and resolve the original review thread when possible.
+
 ## CI and merge policy
 
 Deterministic checks remain authoritative. AI review augments CI; it does not replace tests, linting, type checking, builds, security scanning, or deployment gates.
 
 Busy or high-risk repositories may use merge queues. Repositories using merge queues must run their required CI on both `pull_request` and `merge_group` events.
+
+Repositories should protect the default branch so normal merges require a pull request, required deterministic checks, and conversation resolution. Direct pushes to the protected default branch should be restricted. Repository rulesets may strengthen these defaults.
 
 ## Automation and agents
 
