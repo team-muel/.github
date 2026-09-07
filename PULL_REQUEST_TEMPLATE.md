@@ -35,6 +35,18 @@
 - [ ] Can explain the failure scenarios
 - [ ] Identified the impact surface and documented it above
 - [ ] Tested it myself
+- [ ] Required deterministic CI is green
+- [ ] Automated review has completed (including Codex when configured)
+- [ ] Material findings are fixed or explicitly dispositioned
+- [ ] Material review conversations are resolved
+- [ ] If the diff changed materially after review, final review was re-run
+
+## Emergency hotfix
+<!-- Leave unchecked for normal PRs. Use only for an active production/security incident where waiting materially worsens the incident. -->
+- [ ] This is an emergency hotfix
+- [ ] The incident/risk justifying bypass is described above
+- [ ] The change is minimal and independently revertible
+- [ ] Normal automated review has been requested and late material findings will be remediated through Linear
 
 ---
 ### For the AI reviewer
