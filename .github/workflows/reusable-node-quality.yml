@@ -7,7 +7,17 @@ on:
         description: Node.js version
         required: false
         type: string
-        default: '20'
+        default: '24'
+      package-manager:
+        description: Optional setup-node cache package manager (npm, yarn, or pnpm); leave empty to disable caching
+        required: false
+        type: string
+        default: ''
+      cache-dependency-path:
+        description: Optional dependency lockfile path used for cache keys
+        required: false
+        type: string
+        default: ''
       install-command:
         description: Dependency installation command
         required: false
@@ -36,7 +46,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          cache: npm
+          cache: ${{ inputs.package-manager }}
+          cache-dependency-path: ${{ inputs.cache-dependency-path }}
       - name: Install dependencies
         run: ${{ inputs.install-command }}
       - name: Test
