@@ -9,7 +9,7 @@ on:
         type: string
         default: '3.12'
       requirements-file:
-        description: Requirements file; leave empty to skip
+        description: Requirements file; leave empty to skip dependency installation and pip caching
         required: false
         type: string
         default: requirements-dev.txt
@@ -19,10 +19,10 @@ on:
         type: string
         default: python -m pytest -q
       build-command:
-        description: Build command; leave empty to skip
+        description: Optional build command; leave empty for non-package repositories
         required: false
         type: string
-        default: python -m build
+        default: ''
 
 permissions:
   contents: read
@@ -33,10 +33,18 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Set up Python with pip cache
+        if: ${{ inputs.requirements-file != '' }}
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
           cache: pip
+          cache-dependency-path: ${{ inputs.requirements-file }}
+      - name: Set up Python without cache
+        if: ${{ inputs.requirements-file == '' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
       - name: Install dependencies
         if: ${{ inputs.requirements-file != '' }}
         run: python -m pip install --requirement "${{ inputs.requirements-file }}"
