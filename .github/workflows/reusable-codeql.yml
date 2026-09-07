@@ -1,0 +1,41 @@
+name: reusable-codeql
+
+on:
+  workflow_call:
+    inputs:
+      languages-json:
+        description: JSON array of CodeQL languages, for example ["javascript-typescript"] or ["python"]
+        required: false
+        type: string
+        default: '["javascript-typescript"]'
+      build-mode:
+        description: CodeQL build mode. Use none for interpreted/JavaScript repositories and manual only when the caller supplies build steps separately.
+        required: false
+        type: string
+        default: none
+
+permissions:
+  contents: read
+  security-events: write
+  packages: read
+
+jobs:
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(inputs.languages-json) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ inputs.build-mode }}
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ matrix.language }}
